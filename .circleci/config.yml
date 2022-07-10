@@ -263,6 +263,7 @@ jobs:
           command: |
             apk add --update ansible
             apk add nodejs npm
+            pip install awscli
             apk add --update tar gzip
       - run:
           name: Deploy backend
