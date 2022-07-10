@@ -1,0 +1,25 @@
+---
+
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
+- name: Copy Artifact
+  become: true
+  copy:
+    src: files/artifact.tar.gz
+    dest: ~/
+
+- name: Extract Artifact
+  become: true
+  shell: |
+    tar -xvzf ~/artifact.tar.gz
+
+- name: Executing node
+  shell: |
+    pm2 stop default
+    pm2 start npm -- start
