@@ -11,8 +11,8 @@
 - name: Copy Artifact
   become: true
   copy:
-    src: project/artifact.tar.gz
-    dest: ~/
+    src: "project/artifact.tar.gz"
+    dest: "~/"
 
 - name: Extract Artifact
   become: true
