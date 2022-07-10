@@ -303,6 +303,8 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -317,28 +319,15 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IPCount=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text | wc -l)
-            if [[ "${BACKEND_IPCount}" == "1" ]]
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
+            echo "$BACKEND_IP"
+            API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl -s "${API_URL}/api/status" | grep "ok"
             then
-              BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
-              API_URL="http://${BACKEND_IP}:3030"
-              echo "${API_URL}"
-              if curl -s "${API_URL}/api/status" | grep "ok"
-              then
-                  return 0
-              else
-                  return 1
-              fi
+                return 0
             else
-              BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[1].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
-              API_URL="http://${BACKEND_IP}:3030"
-              echo "${API_URL}"
-              if curl -s "${API_URL}/api/status" | grep "ok"
-              then
-                  return 0
-              else
-                  return 1
-              fi
+                return 1
             fi
       - run:
           name: Frontend smoke test.
@@ -384,6 +373,8 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Get old stack workflow id
           command: |
