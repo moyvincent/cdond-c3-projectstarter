@@ -317,14 +317,28 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
-            if curl -s "${API_URL}/api/status" | grep "ok"
+            export BACKEND_IPCount=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text | wc -l)
+            if $BACKEND_IPCount == 1
             then
-                return 0
+              BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
+              API_URL="http://${BACKEND_IP}:3030"
+              echo "${API_URL}"
+              if curl -s "${API_URL}/api/status" | grep "ok"
+              then
+                  return 0
+              else
+                  return 1
+              fi
             else
-                return 1
+              BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[1].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
+              API_URL="http://${BACKEND_IP}:3030"
+              echo "${API_URL}"
+              if curl -s "${API_URL}/api/status" | grep "ok"
+              then
+                  return 0
+              else
+                  return 1
+              fi
             fi
       - run:
           name: Frontend smoke test.
