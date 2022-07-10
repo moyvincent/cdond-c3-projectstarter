@@ -318,7 +318,7 @@ jobs:
           name: Backend smoke test.
           command: |
             export BACKEND_IPCount=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text | wc -l)
-            if $BACKEND_IPCount == 1
+            if [[ "${BACKEND_IPCount}" == "1" ]]
             then
               BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" --output text)
               API_URL="http://${BACKEND_IP}:3030"
