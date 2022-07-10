@@ -386,6 +386,7 @@ jobs:
 
             export OldWorkflowID="${OldWorkflowID}"
             # export STACKS=[] #put the list of stacks here
+            
       - run:
           name: Remove old stacks and files
           command: |
